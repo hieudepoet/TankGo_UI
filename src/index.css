@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+@theme {
+  --color-yellow: #fec117;
+  --color-dark-yellow: #b18610;
+  --color-blue: #0ea3c8;
+  --color-dark-blue: #175681;
+}
+
+/* * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}  Tailwind CSS sawnx roif */

@@ -8,7 +8,7 @@ const Home = () => {
   return (
     <>
       <Header />
-      <div className="bg-black min-h-screen">
+      <div className="min-h-screen">
         <WalletConnect />
         <WalletStatus />
       </div>

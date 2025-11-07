@@ -1,0 +1,94 @@
+import { useState } from "react";
+import { useWalletConnection } from "../hooks/useWalletConnection";
+import { TankBattleSDK } from "../sdk/suiClient";
+import type { GameRoom } from "../data/types";
+import { useRooms } from "../hooks/useRooms";
+
+const GameLobby: React.FC = () => {
+  const rooms = useRooms();
+  console.log("Rooms in lobby:", rooms);
+
+  const { connected, account, signAndExecuteTransactionBlock } =
+    useWalletConnection();
+  const [sdk] = useState(() => new TankBattleSDK());
+  const [joining, setJoining] = useState(false);
+
+  const joinArena = async (arenaId: string, entryFee: number) => {
+    if (!connected || !account) return;
+
+    setJoining(true);
+    try {
+      const txb = await sdk.joinArena(arenaId, entryFee);
+      const result = await signAndExecuteTransactionBlock({
+        transactionBlock: txb,
+      });
+      console.log("Joined arena:", result);
+    } catch (error) {
+      console.error("Join failed:", error);
+    } finally {
+      setJoining(false);
+    }
+  };
+
+  if (!connected) {
+    return (
+      <div className="text-center text-black">
+        <p>Vui lòng kết nối ví để tham gia game</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full bg-yellow min-h-screen flex justify-center items-start">
+      <div className="w-[70%]">
+        <header className="">
+          <h2 className=" text-xl mb-4">Sảnh Game For Arena I</h2>
+          <p>
+            Phí tham gia: 10 TANK
+            <br />
+            Số lượng người chơi: 2 người
+          </p>
+        </header>
+
+        <div className="mt-[200px] flex justify-between items-stretch">
+          {/* left part: thoong tin user */}
+          <div className="flex-[1]">
+            <h3 className="text-white font-bold">Thông tin người chơi</h3>
+            <p className="text-white text-sm">Tài khoản: ...</p>
+          </div>
+          {/* right part: list cac phong hoac tao moi */}
+          <div className="flex-[3] bg-blue p-10">
+            <h3 className="text-tank-green font-bold mb-2">Danh sách phòng</h3>
+            {/* tim kiem va tao moi phong TODO */}
+            {/* <div></div> */}
+            <div>
+              {rooms.map((room: GameRoom) => (
+                <div key={room.id}>
+                  <h4 className="text-white font-bold">{room.id}</h4>
+                  <p className="text-white text-sm">
+                    Số lượng người chơi: {room.currentPlayers.length}/
+                    {room.numOfPlayers}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* <div className="grid gap-4">
+        <div className="p-4 rounded border border-tank-green">
+          <button
+            onClick={() => joinArena("arena_1", 10)}
+            disabled={joining}
+            className="mt-2 bg-tank-green text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50"
+          >
+            {joining ? "Đang tham gia..." : "Tham Gia"}
+          </button>
+        </div>
+      </div> */}
+      </div>
+    </div>
+  );
+};
+
+export default GameLobby;
